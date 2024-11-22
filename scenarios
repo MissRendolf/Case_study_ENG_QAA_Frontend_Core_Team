@@ -1,4 +1,5 @@
 Scenario 1: Verify URL Query Parameters
+
 Given: The user is on the category page (https://pop.shoptet.cz/obleceni/) with no filters applied.
 When: The user:
 Selects the "Novinka" checkbox.
@@ -9,60 +10,8 @@ novinka=1 is in the query.
 tip=1 is in the query.
 price_min=500 and price_max=850 are in the query.
 
-Cypress Tests
-describe('Filter Component - URL Query Parameters', () => {
-  it('should update the URL with the correct query parameters after filtering', () => {
-    cy.visit('https://pop.shoptet.cz/obleceni/');
-
-    // Select "Novinka" and "Tip" checkboxes
-    cy.get('input[id="novinka"]').check({ force: true });
-    cy.get('input[id="tip"]').check({ force: true });
-
-    // Adjust the price slider (assuming slider elements have specific selectors)
-    cy.get('.price-slider-min').clear().type('500');
-    cy.get('.price-slider-max').clear().type('850');
-
-    // Verify URL query parameters
-    cy.url().should('include', 'novinka=1');
-    cy.url().should('include', 'tip=1');
-    cy.url().should('include', 'price_min=500');
-    cy.url().should('include', 'price_max=850');
-  });
-});
-
-Python (Selenium) Tests
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-
-def test_query_parameters():
-    driver = webdriver.Chrome()
-    driver.get("https://pop.shoptet.cz/obleceni/")
-
-    # Select "Novinka" and "Tip" checkboxes
-    driver.find_element(By.ID, "novinka").click()
-    driver.find_element(By.ID, "tip").click()
-
-    # Adjust the price sliders
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").clear()
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").send_keys("500")
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").clear()
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").send_keys("850")
-
-    # Verify URL
-    current_url = driver.current_url
-    assert "novinka=1" in current_url
-    assert "tip=1" in current_url
-    assert "price_min=500" in current_url
-    assert "price_max=850" in current_url
-
-    driver.quit()
-
-
-
-
-
-
 Scenario 2: Verify Filtered Results in the Grid
+
 Given: The user is on the category page (https://pop.shoptet.cz/obleceni/) with all products visible.
 When: The user:
 Selects the "Novinka" checkbox.
@@ -72,65 +21,3 @@ Then: The product grid should:
 Display only items marked as "Novinka" or "Tip."
 Show items with prices between 500 Kč and 850 Kč.
 Exclude items that don’t match these criteria.
-
-Cypress Tests
-describe('Filter Component - Grid Output Verification', () => {
-  it('should display only filtered products in the grid', () => {
-    cy.visit('https://pop.shoptet.cz/obleceni/');
-
-    // Select "Novinka" and "Tip" checkboxes
-    cy.get('input[id="novinka"]').check({ force: true });
-    cy.get('input[id="tip"]').check({ force: true });
-
-    // Adjust the price slider
-    cy.get('.price-slider-min').clear().type('500');
-    cy.get('.price-slider-max').clear().type('850');
-
-    // Wait for the grid to update and verify visible items
-    cy.get('.product-grid-item').should('have.length.greaterThan', 0).each(($item) => {
-      // Verify each item has "Novinka" or "Tip" tag
-      cy.wrap($item).find('.product-tag').should('contain.text', 'Novinka').or('contain.text', 'Tip');
-
-      // Verify the price is within range
-      cy.wrap($item)
-        .find('.price')
-        .invoke('text')
-        .then((priceText) => {
-          const price = parseInt(priceText.replace(' Kč', '').replace(' ', ''));
-          expect(price).to.be.gte(500).and.lte(850);
-        });
-    });
-  });
-});
-
-Python (Selenium) Tests
-
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-
-def test_filtered_results():
-    driver = webdriver.Chrome()
-    driver.get("https://pop.shoptet.cz/obleceni/")
-
-    # Select "Novinka" and "Tip" checkboxes
-    driver.find_element(By.ID, "novinka").click()
-    driver.find_element(By.ID, "tip").click()
-
-    # Adjust the price sliders
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").clear()
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").send_keys("500")
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").clear()
-    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").send_keys("850")
-
-    # Verify grid items
-    items = driver.find_elements(By.CSS_SELECTOR, ".product-grid-item")
-    for item in items:
-        # Check tags
-        tags = [tag.text for tag in item.find_elements(By.CSS_SELECTOR, ".product-tag")]
-        assert "Novinka" in tags or "Tip" in tags, "Item does not match tags"
-
-        # Check price
-        price = int(item.find_element(By.CSS_SELECTOR, ".price").text.replace(" Kč", "").replace(" ", ""))
-        assert 500 <= price <= 850, f"Price {price} is out of range"
-
-    driver.quit()
