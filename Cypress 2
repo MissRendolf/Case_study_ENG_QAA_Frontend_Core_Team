@@ -1,0 +1,28 @@
+describe('Filter Component - Grid Output Verification', () => {
+  it('should display only filtered products in the grid', () => {
+    cy.visit('https://pop.shoptet.cz/obleceni/');
+
+    // Select "Novinka" and "Tip" checkboxes
+    cy.get('input[id="novinka"]').check({ force: true });
+    cy.get('input[id="tip"]').check({ force: true });
+
+    // Adjust the price slider
+    cy.get('.price-slider-min').clear().type('500');
+    cy.get('.price-slider-max').clear().type('850');
+
+    // Wait for the grid to update and verify visible items
+    cy.get('.product-grid-item').should('have.length.greaterThan', 0).each(($item) => {
+      // Verify each item has "Novinka" or "Tip" tag
+      cy.wrap($item).find('.product-tag').should('contain.text', 'Novinka').or('contain.text', 'Tip');
+
+      // Verify the price is within range
+      cy.wrap($item)
+        .find('.price')
+        .invoke('text')
+        .then((priceText) => {
+          const price = parseInt(priceText.replace(' Kč', '').replace(' ', ''));
+          expect(price).to.be.gte(500).and.lte(850);
+        });
+    });
+  });
+});
