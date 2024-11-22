@@ -10,4 +10,12 @@ describe('Filter Component - URL Query Parameters', () => {
     cy.get('.price-slider-min').clear().type('500');
     cy.get('.price-slider-max').clear().type('850');
 
+    // Verify URL query parameters
+    cy.url().should('include', 'novinka=1');
+    cy.url().should('include', 'tip=1');
+    cy.url().should('include', 'price_min=500');
+    cy.url().should('include', 'price_max=850');
+  });
+});
+
 
