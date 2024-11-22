@@ -1,0 +1,29 @@
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+def test_filtered_results():
+    driver = webdriver.Chrome()
+    driver.get("https://pop.shoptet.cz/obleceni/")
+
+    # Select "Novinka" and "Tip" checkboxes
+    driver.find_element(By.ID, "novinka").click()
+    driver.find_element(By.ID, "tip").click()
+
+    # Adjust the price sliders
+    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").clear()
+    driver.find_element(By.CSS_SELECTOR, ".price-slider-min").send_keys("500")
+    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").clear()
+    driver.find_element(By.CSS_SELECTOR, ".price-slider-max").send_keys("850")
+
+    # Verify grid items
+    items = driver.find_elements(By.CSS_SELECTOR, ".product-grid-item")
+    for item in items:
+        # Check tags
+        tags = [tag.text for tag in item.find_elements(By.CSS_SELECTOR, ".product-tag")]
+        assert "Novinka" in tags or "Tip" in tags, "Item does not match tags"
+
+        # Check price
+        price = int(item.find_element(By.CSS_SELECTOR, ".price").text.replace(" Kč", "").replace(" ", ""))
+        assert 500 <= price <= 850, f"Price {price} is out of range"
+
+    driver.quit()
