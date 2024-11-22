@@ -1,0 +1,19 @@
+describe('Filter Component - URL Query Parameters', () => {
+  it('should update the URL with the correct query parameters after filtering', () => {
+    cy.visit('https://pop.shoptet.cz/obleceni/');
+
+    // Select "Novinka" and "Tip" checkboxes
+    cy.get('input[id="novinka"]').check({ force: true });
+    cy.get('input[id="tip"]').check({ force: true });
+
+    // Adjust the price slider (assuming slider elements have specific selectors)
+    cy.get('.price-slider-min').clear().type('500');
+    cy.get('.price-slider-max').clear().type('850');
+
+    // Verify URL query parameters
+    cy.url().should('include', 'novinka=1');
+    cy.url().should('include', 'tip=1');
+    cy.url().should('include', 'price_min=500');
+    cy.url().should('include', 'price_max=850');
+  });
+});
